@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parent_wish/ui/screens/register_screen.dart';
 
 class AppRouter {
   static const String home = '/home';
@@ -7,7 +8,7 @@ class AppRouter {
     switch (settings.name) {
       case home:
         return MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const RegisterScreen(),
         );
       default:
         return null;

@@ -7,6 +7,8 @@ import 'package:parent_wish/bloc/bloc_manager.dart';
 import 'package:parent_wish/utils/routers.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load environment variables

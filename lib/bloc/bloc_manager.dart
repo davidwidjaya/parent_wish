@@ -1,10 +1,9 @@
+import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
 import 'package:parent_wish/bloc/bloc_exports.dart';
 
 class BlocManager {
-  
   // Declare all the blocs here
   static final authBloc = AuthBloc();
-
 
   static final List<BlocProvider> blocProviders = [
     BlocProvider<AuthBloc>(
@@ -20,7 +19,6 @@ class BlocManager {
   }
 
   BlocManager._internal();
-
 
   static void dispose() {
     authBloc.close();
