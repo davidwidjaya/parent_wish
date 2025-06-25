@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const CircularProgressIndicator(),
             const SizedBox(height: 20),
             Text(
-              'Register...',
+              'Home...',
               style: Theme.of(context).textTheme.headline6,
             ),
           ],

@@ -22,6 +22,7 @@ class AppColors {
   static const Color gray100 = Color(0xFFF9F9F9); // lightBackground
 
   /// Text and UI grays
+  static const Color gray300 = Color(0xFFF3F3F3);
   static const Color gray400 = Color(0xFFA7AEC1); // textSecondary
   static const Color gray500 = Color(0xFF888888); // textMuted
   static const Color gray600 = Color(0xFF8C8E98); // textDisabled
@@ -29,5 +30,5 @@ class AppColors {
 
   // --- Status Colors ---
   static const Color green500 = Color(0xFF00D261); // success
-  static const Color red500 = Color(0xFFFF0000);   // error
+  static const Color red500 = Color(0xFFFF0000); // error
 }
