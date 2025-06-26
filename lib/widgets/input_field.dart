@@ -5,7 +5,10 @@ import 'package:parent_wish/ui/themes/color.dart';
 class InputField extends StatefulWidget {
   final String label;
   final String hintText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
+  final String? prefixIconAsset;
+  final IconData? suffixIcon;
+  final String? suffixIconAsset;
   final bool isPassword;
   final TextEditingController? controller;
   final TextInputType keyboardType;
@@ -16,7 +19,10 @@ class InputField extends StatefulWidget {
     super.key,
     required this.label,
     required this.hintText,
-    required this.prefixIcon,
+    this.prefixIcon,
+    this.prefixIconAsset,
+    this.suffixIcon,
+    this.suffixIconAsset,
     this.isPassword = false,
     this.controller,
     this.keyboardType = TextInputType.text,
@@ -30,6 +36,53 @@ class InputField extends StatefulWidget {
 
 class _InputFieldState extends State<InputField> {
   bool _obscureText = true;
+
+  Widget? _buildPrefixIcon() {
+    if (widget.prefixIconAsset != null) {
+      return Padding(
+        padding: EdgeInsets.only(left: 12.w, right: 12.w),
+        child: Image.asset(
+          widget.prefixIconAsset!,
+          width: 24.w,
+          height: 24.h,
+          fit: BoxFit.contain,
+        ),
+      );
+    } else if (widget.prefixIcon != null) {
+      return Icon(widget.prefixIcon, color: AppColors.gray400, size: 24.w);
+    }
+    return null;
+  }
+
+  Widget? _buildSuffixIcon() {
+    if (widget.isPassword) {
+      return IconButton(
+        icon: Icon(
+          _obscureText ? Icons.visibility_off : Icons.visibility,
+          color: AppColors.gray400,
+          size: 24.w,
+        ),
+        onPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+      );
+    } else if (widget.suffixIconAsset != null) {
+      return Padding(
+        padding: EdgeInsets.all(12.w),
+        child: Image.asset(
+          widget.suffixIconAsset!,
+          width: 24.w,
+          height: 24.w,
+          fit: BoxFit.contain,
+        ),
+      );
+    } else if (widget.suffixIcon != null) {
+      return Icon(widget.suffixIcon, color: AppColors.gray400, size: 24.w);
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +100,10 @@ class _InputFieldState extends State<InputField> {
         SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.gray100,
-            borderRadius: BorderRadius.circular(16.w),
+            color: AppColors.gray50,
+            borderRadius: BorderRadius.circular(15.w),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: TextFormField(
             controller: widget.controller,
             keyboardType: widget.keyboardType,
@@ -65,22 +118,8 @@ class _InputFieldState extends State<InputField> {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
-              icon:
-                  Icon(widget.prefixIcon, color: AppColors.gray400, size: 24.w),
-              suffixIcon: widget.isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: AppColors.gray400,
-                        size: 24.w,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    )
-                  : null,
+              prefixIcon: _buildPrefixIcon(),
+              suffixIcon: _buildSuffixIcon(),
             ),
           ),
         ),
