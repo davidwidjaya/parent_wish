@@ -36,30 +36,59 @@ class InputField extends StatefulWidget {
 
 class _InputFieldState extends State<InputField> {
   bool _obscureText = true;
+  bool _isFocused = false;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    setState(() {
+      _isFocused = _focusNode.hasFocus;
+    });
+  }
 
   Widget? _buildPrefixIcon() {
+    Color iconColor = _isFocused ? AppColors.blue500 : AppColors.gray400;
+
     if (widget.prefixIconAsset != null) {
       return Padding(
         padding: EdgeInsets.only(left: 12.w, right: 12.w),
-        child: Image.asset(
-          widget.prefixIconAsset!,
-          width: 24.w,
-          height: 24.h,
-          fit: BoxFit.contain,
+        child: ColorFiltered(
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          child: Image.asset(
+            widget.prefixIconAsset!,
+            width: 24.w,
+            height: 24.h,
+            fit: BoxFit.contain,
+          ),
         ),
       );
     } else if (widget.prefixIcon != null) {
-      return Icon(widget.prefixIcon, color: AppColors.gray400, size: 24.w);
+      return Icon(widget.prefixIcon, color: iconColor, size: 24.w);
     }
     return null;
   }
 
   Widget? _buildSuffixIcon() {
+    Color iconColor = _isFocused ? AppColors.blue500 : AppColors.gray400;
+
     if (widget.isPassword) {
       return IconButton(
         icon: Icon(
           _obscureText ? Icons.visibility_off : Icons.visibility,
-          color: AppColors.gray400,
+          color: iconColor,
           size: 24.w,
         ),
         onPressed: () {
@@ -71,15 +100,18 @@ class _InputFieldState extends State<InputField> {
     } else if (widget.suffixIconAsset != null) {
       return Padding(
         padding: EdgeInsets.all(12.w),
-        child: Image.asset(
-          widget.suffixIconAsset!,
-          width: 24.w,
-          height: 24.w,
-          fit: BoxFit.contain,
+        child: ColorFiltered(
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          child: Image.asset(
+            widget.suffixIconAsset!,
+            width: 24.w,
+            height: 24.w,
+            fit: BoxFit.contain,
+          ),
         ),
       );
     } else if (widget.suffixIcon != null) {
-      return Icon(widget.suffixIcon, color: AppColors.gray400, size: 24.w);
+      return Icon(widget.suffixIcon, color: iconColor, size: 24.w);
     }
     return null;
   }
@@ -100,18 +132,42 @@ class _InputFieldState extends State<InputField> {
         SizedBox(height: 10.h),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.gray50,
-            borderRadius: BorderRadius.circular(15.w),
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(15.r),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: TextFormField(
             controller: widget.controller,
+            focusNode: _focusNode,
             keyboardType: widget.keyboardType,
             obscureText: widget.isPassword ? _obscureText : false,
             validator: widget.validator,
             onChanged: widget.onChanged,
             decoration: InputDecoration(
-              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.r),
+                borderSide: BorderSide(
+                  color: AppColors.blue500,
+                  width: 1.w,
+                ),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14.w,
+                vertical: 14.h,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.r),
+                borderSide: BorderSide(
+                  color: AppColors.gray300,
+                  width: 1.w,
+                ),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.r),
+                borderSide: BorderSide(
+                  color: AppColors.gray300,
+                  width: 1.w,
+                ),
+              ),
               hintText: widget.hintText,
               hintStyle: const TextStyle(
                 color: AppColors.gray400,

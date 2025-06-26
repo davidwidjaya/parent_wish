@@ -4,14 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/widgets/input_field.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final userIdController = TextEditingController();
@@ -30,7 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Create Account',
+                  'Login Account',
                   style: TextStyle(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.w600,
@@ -40,24 +40,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Padding(
                   padding: EdgeInsets.only(top: 4.h),
                   child: Text(
-                    'Start learning with create your account',
+                    'Please login with registered account',
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w400,
                       color: AppColors.gray400,
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 30.h),
-                  child: InputField(
-                    label: 'User ID',
-                    hintText: 'Create your User ID',
-                    prefixIconAsset: 'assets/icons/profile.png',
-                    controller: userIdController,
-                    validator: (value) => value == null || value.isEmpty
-                        ? 'User ID is required'
-                        : null,
                   ),
                 ),
                 Padding(
@@ -86,6 +74,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 Padding(
+                  padding: EdgeInsets.only(top: 15.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.blue500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
                   padding: EdgeInsets.only(top: 50.h),
                   child: SizedBox(
                     width: double.infinity,
@@ -100,7 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       child: Text(
-                        'Create Account',
+                        'Sign In',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
@@ -224,7 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Have an account?',
+                        'Don’t have an account?',
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w400,
@@ -234,7 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Padding(
                         padding: EdgeInsets.only(left: 4.w),
                         child: Text(
-                          'Sign In',
+                          'Create Account',
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w700,

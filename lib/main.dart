@@ -6,6 +6,7 @@ import 'package:parent_wish/bloc/app_bloc_observer.dart';
 import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
 import 'package:parent_wish/bloc/bloc_exports.dart';
 import 'package:parent_wish/bloc/bloc_manager.dart';
+import 'package:parent_wish/ui/screens/add_children_screen.dart';
 import 'package:parent_wish/ui/screens/index.dart';
 import 'package:parent_wish/utils/routers.dart';
 
@@ -55,7 +56,7 @@ class _ParentWishState extends State<ParentWish> {
                 // First time open app or logged out
                 if (state is AuthInitial || state is AuthUnauthenticated) {
                   // return const SplashScreen(); // welcome screen with buttons
-                  return const RegisterScreen(); // welcome screen with buttons
+                  return const ListChildrenScreen(); // welcome screen with buttons
                 }
 
                 // After successful login
