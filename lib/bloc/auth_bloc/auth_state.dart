@@ -33,6 +33,15 @@ class AuthProfileCompleted extends AuthState {}
 
 class AuthChildrenAdded extends AuthState {}
 
+class AuthListChildrenFetched extends AuthState {
+  final List<Child> children;
+
+  AuthListChildrenFetched({required this.children});
+
+  @override
+  List<Object?> get props => [children];
+}
+
 class AuthError extends AuthState {
   final String message;
 

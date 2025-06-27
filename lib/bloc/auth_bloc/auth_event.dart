@@ -99,6 +99,14 @@ class AuthAddChildren extends AuthEvent {
       ];
 }
 
+class AuthListChildren extends AuthEvent {
+
+  AuthListChildren();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class AuthLoginManual extends AuthEvent {
   final String email;
   final String password;

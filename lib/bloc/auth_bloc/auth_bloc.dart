@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:parent_wish/data/models/child.dart';
 import 'package:parent_wish/data/models/index.dart';
 import 'package:parent_wish/data/repositories/auth_repository.dart';
 import 'package:parent_wish/data/repositories/repository_manager.dart';
@@ -93,6 +94,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
 
         emit(AuthChildrenAdded());
+      } catch (error) {
+        emit(AuthError(message: error.toString()));
+      }
+    });
+
+    on<AuthListChildren>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await authRepository.listChildren();
+
+        emit(AuthListChildrenFetched(children: result.children));
       } catch (error) {
         emit(AuthError(message: error.toString()));
       }

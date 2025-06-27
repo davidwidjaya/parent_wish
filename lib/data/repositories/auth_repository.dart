@@ -208,6 +208,17 @@ class AuthRepository {
     }
   }
 
+  Future<ListChildrenResponse> listChildren() async {
+    final response = await ApiClient.get('/children/list');
+
+    if (response['status_code'] == 200) {
+      return ListChildrenResponse.fromJson(response);
+    } else {
+      throw Exception(
+          'Failed to get children: ${response['message'] ?? 'Unknown error'}');
+    }
+  }
+
   Future<LoginResponse> loginManual({
     required String email,
     required String password,

@@ -1,4 +1,6 @@
 export 'auth_response.dart';
+import 'package:parent_wish/data/models/child.dart';
+
 import '../models/user.dart';
 import '../models/verif_code_email.dart';
 
@@ -146,6 +148,31 @@ class AddChildrenResponse {
     );
   }
 }
+
+
+class ListChildrenResponse {
+  final int statusCode;
+  final String message;
+  final List<Child> children;
+
+  ListChildrenResponse({
+    required this.statusCode,
+    required this.message,
+    required this.children,
+  });
+
+  factory ListChildrenResponse.fromJson(Map<String, dynamic> json) {
+    final childrenData = json['data'] as List<dynamic>;
+    final children = childrenData.map((child) => Child.fromJson(child)).toList();
+
+    return ListChildrenResponse(
+      statusCode: json['status_code'],
+      message: json['message'],
+      children: children,
+    );
+  }
+}
+
 
 class LoginResponse {
   final int statusCode;
