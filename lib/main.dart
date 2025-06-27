@@ -56,7 +56,7 @@ class _ParentWishState extends State<ParentWish> {
                 // First time open app or logged out
                 if (state is AuthInitial || state is AuthUnauthenticated) {
                   // return const SplashScreen(); // welcome screen with buttons
-                  return const ListChildrenScreen(); // welcome screen with buttons
+                  return const CompleteProfileScreen(); // welcome screen with buttons
                 }
 
                 // After successful login

@@ -4,24 +4,78 @@ import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/widgets/input_dropdown.dart';
 import 'package:parent_wish/widgets/input_field.dart';
 
-class AddChildrenScreen extends StatefulWidget {
-  const AddChildrenScreen({super.key});
+class CompleteProfileScreen extends StatefulWidget {
+  const CompleteProfileScreen({super.key});
 
   @override
-  State<AddChildrenScreen> createState() => _AddChildrenScreenState();
+  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
 }
 
-class _AddChildrenScreenState extends State<AddChildrenScreen> {
+class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final userIdController = TextEditingController();
-  String? selectedAge;
-  String? selectedSchoolDays;
+  String? selectedParentType;
+  String? selectedTimezone;
+
+  static const List<DropdownMenuItem<String>> timezoneItems = [
+    DropdownMenuItem(
+        value: "Pacific/Midway", child: Text("(UTC-11:00) Pacific/Midway")),
+    DropdownMenuItem(
+        value: "America/Adak", child: Text("(UTC-10:00) America/Adak")),
+    DropdownMenuItem(
+        value: "Pacific/Honolulu", child: Text("(UTC-10:00) Pacific/Honolulu")),
+    DropdownMenuItem(
+        value: "America/Anchorage",
+        child: Text("(UTC-09:00) America/Anchorage")),
+    DropdownMenuItem(
+        value: "America/Los_Angeles",
+        child: Text("(UTC-08:00) America/Los_Angeles")),
+    DropdownMenuItem(
+        value: "America/Denver", child: Text("(UTC-07:00) America/Denver")),
+    DropdownMenuItem(
+        value: "America/Chicago", child: Text("(UTC-06:00) America/Chicago")),
+    DropdownMenuItem(
+        value: "America/New_York", child: Text("(UTC-05:00) America/New_York")),
+    DropdownMenuItem(
+        value: "America/Caracas", child: Text("(UTC-04:00) America/Caracas")),
+    DropdownMenuItem(
+        value: "America/Santiago", child: Text("(UTC-04:00) America/Santiago")),
+    DropdownMenuItem(
+        value: "America/St_Johns", child: Text("(UTC-03:30) America/St_Johns")),
+    DropdownMenuItem(
+        value: "America/Argentina/Buenos_Aires",
+        child: Text("(UTC-03:00) Buenos Aires")),
+    DropdownMenuItem(
+        value: "Atlantic/South_Georgia",
+        child: Text("(UTC-02:00) South Georgia")),
+    DropdownMenuItem(
+        value: "Atlantic/Azores", child: Text("(UTC-01:00) Azores")),
+    DropdownMenuItem(value: "UTC", child: Text("(UTC+00:00) UTC")),
+    DropdownMenuItem(value: "Europe/London", child: Text("(UTC+00:00) London")),
+    DropdownMenuItem(value: "Europe/Paris", child: Text("(UTC+01:00) Paris")),
+    DropdownMenuItem(value: "Europe/Berlin", child: Text("(UTC+01:00) Berlin")),
+    DropdownMenuItem(
+        value: "Europe/Istanbul", child: Text("(UTC+03:00) Istanbul")),
+    DropdownMenuItem(
+        value: "Africa/Nairobi", child: Text("(UTC+03:00) Nairobi")),
+    DropdownMenuItem(value: "Asia/Dubai", child: Text("(UTC+04:00) Dubai")),
+    DropdownMenuItem(value: "Asia/Karachi", child: Text("(UTC+05:00) Karachi")),
+    DropdownMenuItem(value: "Asia/Dhaka", child: Text("(UTC+06:00) Dhaka")),
+    DropdownMenuItem(value: "Asia/Jakarta", child: Text("(UTC+07:00) Jakarta")),
+    DropdownMenuItem(
+        value: "Asia/Singapore", child: Text("(UTC+08:00) Singapore")),
+    DropdownMenuItem(value: "Asia/Tokyo", child: Text("(UTC+09:00) Tokyo")),
+    DropdownMenuItem(
+        value: "Australia/Sydney", child: Text("(UTC+10:00) Sydney")),
+    DropdownMenuItem(
+        value: "Pacific/Auckland", child: Text("(UTC+12:00) Auckland")),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Enter your children`s detail',
+          'Complete Profile',
           style: TextStyle(
             color: AppColors.white,
             fontSize: 22.sp,
@@ -126,39 +180,36 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                       ),
                       SizedBox(height: 16.h),
                       InputField(
-                        label: 'Gender',
-                        hintText: 'Enter gender',
+                        label: 'Date of Birth',
+                        hintText: 'Enter date of birth',
                         controller: userIdController,
                       ),
                       SizedBox(height: 16.h),
                       InputDropdown<String>(
-                        label: 'Age Category',
-                        hintText: 'Select age range',
-                        value: selectedAge,
+                        label: 'Are You a?',
+                        hintText: 'Select an option',
+                        value: selectedParentType,
                         items: const [
-                          DropdownMenuItem(value: '3-5', child: Text('3 to 5')),
-                          DropdownMenuItem(value: '6-8', child: Text('6 to 8')),
                           DropdownMenuItem(
-                              value: '10-12', child: Text('10 to 12')),
+                            value: 'mother',
+                            child: Text('Mother'),
+                          ),
                           DropdownMenuItem(
-                              value: '13-18', child: Text('13 to 18')),
+                            value: 'father',
+                            child: Text('Father'),
+                          ),
                         ],
                         onChanged: (value) =>
-                            setState(() => selectedAge = value),
+                            setState(() => selectedParentType = value),
                       ),
                       SizedBox(height: 16.h),
                       InputDropdown<String>(
-                        label: 'School Days',
-                        hintText: 'Select school days',
-                        value: selectedSchoolDays,
-                        items: const [
-                          DropdownMenuItem(
-                              value: 'winter', child: Text('Winter')),
-                          DropdownMenuItem(
-                              value: 'summer', child: Text('Summer')),
-                        ],
+                        label: 'Time Zone',
+                        hintText: 'Select your time zone',
+                        value: selectedTimezone,
+                        items: timezoneItems,
                         onChanged: (value) =>
-                            setState(() => selectedSchoolDays = value),
+                            setState(() => selectedTimezone = value),
                       ),
                       SizedBox(height: 74.h), // Gives space before the button
                       SizedBox(
@@ -174,7 +225,7 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
                             ),
                           ),
                           child: Text(
-                            'Save Children',
+                            'Next',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w500,

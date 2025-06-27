@@ -7,6 +7,7 @@ class AppRouter {
   static const String addChildren = '/add_children';
   static const String listChildren = '/list_children';
   static const String loginScreen = '/login';
+  static const String completeProfile = '/complete_profile';
 
   static Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -25,6 +26,10 @@ class AppRouter {
       case listChildren:
         return MaterialPageRoute(
           builder: (_) => const ListChildrenScreen(),
+        );
+      case completeProfile:
+        return MaterialPageRoute(
+          builder: (_) => const CompleteProfileScreen(),
         );
       case loginScreen:
         return MaterialPageRoute(
