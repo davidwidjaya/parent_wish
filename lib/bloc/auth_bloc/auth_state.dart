@@ -11,11 +11,9 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
-  // final User user;
   final String token;
 
   AuthAuthenticated({
-    // this.user = const User(id: 0, username: '', email: ''),
     this.token = '',
   });
 
@@ -28,6 +26,10 @@ class AuthUnauthenticated extends AuthState {}
 class AuthCodeSent extends AuthState {}
 
 class AuthCodeVerified extends AuthState {}
+
+class AuthProfileImageUploaded extends AuthState {}
+
+class AuthProfileCompleted extends AuthState {}
 
 class AuthError extends AuthState {
   final String message;

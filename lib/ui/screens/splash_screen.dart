@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:parent_wish/ui/themes/color.dart';
+import 'package:parent_wish/utils/routers.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -166,7 +167,10 @@ class _SplashScreenState extends State<SplashScreen> {
                               elevation: 0,
                             ),
                             onPressed: () {
-                              // Handle Google Sign Up logic
+                              Navigator.pushNamed(
+                                context,
+                                AppRouter.register,
+                              );
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment
@@ -205,12 +209,23 @@ class _SplashScreenState extends State<SplashScreen> {
                                 color: AppColors.gray500,
                               ),
                             ),
-                            Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.blue500,
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRouter.login,
+                                );
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 3.w),
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.blue500,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

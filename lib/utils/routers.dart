@@ -6,7 +6,7 @@ class AppRouter {
   static const String splash = '/splash';
   static const String addChildren = '/add_children';
   static const String listChildren = '/list_children';
-  static const String loginScreen = '/login';
+  static const String login = '/login';
   static const String completeProfile = '/complete_profile';
   static const String verificationEmail = '/verification_email';
 
@@ -36,7 +36,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const VerificationEmailScreen(),
         );
-      case loginScreen:
+      case login:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
         );

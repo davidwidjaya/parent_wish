@@ -17,6 +17,57 @@ class AuthRegisterManual extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+class AuthSendEmailVerificationCode extends AuthEvent {
+  AuthSendEmailVerificationCode();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class AuthSubmitEmailVerificationCode extends AuthEvent {
+  final String smsCode;
+
+  AuthSubmitEmailVerificationCode({required this.smsCode});
+
+  @override
+  List<Object?> get props => [smsCode];
+}
+
+class AuthUploadImageProfile extends AuthEvent {
+  final String file;
+
+  AuthUploadImageProfile({
+    required this.file,
+  });
+
+  @override
+  List<Object?> get props => [
+        file,
+      ];
+}
+
+class AuthCompleteProfile extends AuthEvent {
+  final String fullname;
+  final String dateOfBirth;
+  final String parentType;
+  final String timezone;
+
+  AuthCompleteProfile({
+    required this.fullname,
+    required this.dateOfBirth,
+    required this.parentType,
+    required this.timezone,
+  });
+
+  @override
+  List<Object?> get props => [
+        fullname,
+        dateOfBirth,
+        parentType,
+        timezone,
+      ];
+}
+
 class AuthLoginManual extends AuthEvent {
   final String email;
   final String password;
@@ -55,25 +106,6 @@ class AuthRegisterFacebook extends AuthEvent {
 
   @override
   List<Object?> get props => [email, name, imageUrl];
-}
-
-class AuthSendVerificationCode extends AuthEvent {
-  final String phoneNumber;
-
-  AuthSendVerificationCode({required this.phoneNumber});
-
-  @override
-  List<Object?> get props => [phoneNumber];
-}
-
-class AuthVerifyCode extends AuthEvent {
-  final String verificationId;
-  final String smsCode;
-
-  AuthVerifyCode({required this.verificationId, required this.smsCode});
-
-  @override
-  List<Object?> get props => [verificationId, smsCode];
 }
 
 class AuthLogout extends AuthEvent {

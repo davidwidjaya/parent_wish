@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
 import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/widgets/input_dropdown.dart';
 import 'package:parent_wish/widgets/input_field.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -12,9 +18,14 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
-  final userIdController = TextEditingController();
+  final fullnameController = TextEditingController();
+  final dobController = TextEditingController();
   String? selectedParentType;
   String? selectedTimezone;
+  File? profileImage;
+
+  final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
 
   static const List<DropdownMenuItem<String>> timezoneItems = [
     DropdownMenuItem(
@@ -70,177 +81,223 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         value: "Pacific/Auckland", child: Text("(UTC+12:00) Auckland")),
   ];
 
+  Future<void> _pickImage() async {
+    final permissionStatus = await Permission.photos.request();
+
+    if (permissionStatus.isGranted) {
+      try {
+        final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+        if (pickedFile != null) {
+          final file = File(pickedFile.path);
+
+          setState(() {
+            profileImage = file;
+          });
+
+          // ignore: use_build_context_synchronously
+          context.read<AuthBloc>().add(AuthUploadImageProfile(file: file.path));
+        } else {
+          print('User cancelled image selection.');
+        }
+      } catch (e) {
+        print('Image picker error: $e');
+      }
+    } else {
+      print('Permission denied to access gallery.');
+    }
+  }
+
+  void _submitProfile() {
+    if (_formKey.currentState?.validate() != true ||
+        selectedParentType == null ||
+        selectedTimezone == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete all fields')),
+      );
+      return;
+    }
+
+    context.read<AuthBloc>().add(
+          AuthCompleteProfile(
+            fullname: fullnameController.text,
+            dateOfBirth: dobController.text,
+            parentType: selectedParentType!,
+            timezone: selectedTimezone!,
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Complete Profile',
-          style: TextStyle(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthProfileCompleted) {
+          Navigator.pushNamed(context, '/add_children');
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Complete Profile',
+              style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w600)),
+          backgroundColor: AppColors.blue500,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_sharp),
             color: AppColors.white,
-            fontSize: 22.sp,
-            fontWeight: FontWeight.w600,
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        backgroundColor: AppColors.blue500,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_sharp),
-          color: AppColors.white,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Stack(
-            children: [
-              // Background
-              Positioned.fill(
-                child: Container(
-                  color: Colors.white,
+        body: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints:
+                BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+            child: Stack(
+              children: [
+                Positioned.fill(child: Container(color: Colors.white)),
+                Positioned(
+                  child: Container(height: 250.h, color: AppColors.blue500),
                 ),
-              ),
-              // Blue header background
-              Positioned(
-                child: Container(
-                  height: 250.h,
-                  color: AppColors.blue500,
-                ),
-              ),
-              // Avatar and camera icon
-              Positioned(
-                top: 60.h,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 50.r,
-                        backgroundImage:
-                            const AssetImage('assets/images/profile-img.png'),
-                        backgroundColor: Colors.grey[300],
-                      ),
-                      Positioned(
-                        top: 60.h,
-                        left: 55.w,
-                        child: IconButton.filled(
-                          onPressed: () {},
-                          icon: Image.asset(
-                            'assets/icons/photo-camera.png',
-                            width: 20.w,
-                            height: 20.h,
-                            color: AppColors.blue500,
-                          ),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.white,
-                            shape: const CircleBorder(),
-                            padding: EdgeInsets.all(6.r),
-                            minimumSize: Size(32.w, 32.h),
+                Positioned(
+                  top: 60.h,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 50.r,
+                          backgroundImage: profileImage != null
+                              ? FileImage(profileImage!)
+                              : const AssetImage(
+                                      'assets/images/profile-img.png')
+                                  as ImageProvider,
+                          backgroundColor: Colors.grey[300],
+                        ),
+                        Positioned(
+                          top: 60.h,
+                          left: 55.w,
+                          child: IconButton.filled(
+                            onPressed: _pickImage,
+                            icon: Image.asset(
+                              'assets/icons/photo-camera.png',
+                              width: 20.w,
+                              height: 20.h,
+                              color: AppColors.blue500,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.white,
+                              shape: const CircleBorder(),
+                              padding: EdgeInsets.all(6.r),
+                              minimumSize: Size(32.w, 32.h),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              // Form
-              Positioned(
-                top: 200.h,
-                left: 24.w,
-                right: 24.w,
-                child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InputField(
-                        label: 'Full Name',
-                        hintText: 'Enter name',
-                        controller: userIdController,
-                      ),
-                      SizedBox(height: 16.h),
-                      InputField(
-                        label: 'Date of Birth',
-                        hintText: 'Enter date of birth',
-                        controller: userIdController,
-                      ),
-                      SizedBox(height: 16.h),
-                      InputDropdown<String>(
-                        label: 'Are You a?',
-                        hintText: 'Select an option',
-                        value: selectedParentType,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'mother',
-                            child: Text('Mother'),
+                Positioned(
+                  top: 200.h,
+                  left: 24.w,
+                  right: 24.w,
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          InputField(
+                            label: 'Full Name',
+                            hintText: 'Enter name',
+                            controller: fullnameController,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Full name is required'
+                                : null,
                           ),
-                          DropdownMenuItem(
-                            value: 'father',
-                            child: Text('Father'),
+                          SizedBox(height: 16.h),
+                          InputField(
+                            label: 'Date of Birth',
+                            hintText: 'Enter date of birth',
+                            controller: dobController,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Date of birth is required'
+                                : null,
+                          ),
+                          SizedBox(height: 16.h),
+                          InputDropdown<String>(
+                            label: 'Are You a?',
+                            hintText: 'Select an option',
+                            value: selectedParentType,
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'mother', child: Text('Mother')),
+                              DropdownMenuItem(
+                                  value: 'father', child: Text('Father')),
+                            ],
+                            onChanged: (value) =>
+                                setState(() => selectedParentType = value),
+                          ),
+                          SizedBox(height: 16.h),
+                          InputDropdown<String>(
+                            label: 'Time Zone',
+                            hintText: 'Select your time zone',
+                            value: selectedTimezone,
+                            items: timezoneItems,
+                            onChanged: (value) =>
+                                setState(() => selectedTimezone = value),
+                          ),
+                          SizedBox(height: 74.h),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              onPressed: _submitProfile,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.blue500,
+                                foregroundColor: AppColors.white,
+                                padding: EdgeInsets.symmetric(vertical: 17.h),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                        onChanged: (value) =>
-                            setState(() => selectedParentType = value),
                       ),
-                      SizedBox(height: 16.h),
-                      InputDropdown<String>(
-                        label: 'Time Zone',
-                        hintText: 'Select your time zone',
-                        value: selectedTimezone,
-                        items: timezoneItems,
-                        onChanged: (value) =>
-                            setState(() => selectedTimezone = value),
-                      ),
-                      SizedBox(height: 74.h), // Gives space before the button
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: () {},
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.blue500,
-                            foregroundColor: AppColors.white,
-                            padding: EdgeInsets.symmetric(vertical: 17.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              // Add bottom padding space if needed
-              SizedBox(height: 40.h),
-            ],
+              ],
+            ),
           ),
         ),
       ),

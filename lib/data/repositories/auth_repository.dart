@@ -1,6 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:parent_wish/data/responses/auth_response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../models/user.dart';
 import '../../utils/api_client.dart';
@@ -12,7 +16,7 @@ class AuthRepository {
     required String password,
   }) async {
     final response = await ApiClient.post(
-      '/api/auth/register',
+      '/auth/register',
       body: {
         'username': username,
         'email': email,
@@ -20,16 +24,130 @@ class AuthRepository {
       },
     );
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
+    // response is a Map<String, dynamic>
+    if (response['status_code'] == 201) {
+      final data = response['data'];
+
+      // Save token to shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token']);
+
       return RegisterResponse(
         user: User.fromJson(data),
         token: data['token'],
-        statusCode: response.statusCode,
-        message: data['message'] ?? '',
+        statusCode: response['status_code'],
+        message: response['message'] ?? '',
       );
     } else {
-      throw Exception('Failed to register: ${response.body}');
+      throw Exception('Failed to register: ${response.toString()}');
+    }
+  }
+
+  Future<SendEmailVerificationResponse> sendEmailVerification() async {
+    final response = await ApiClient.post('/verif-code/request-code');
+
+    if (response['status_code'] == 200) {
+      final data = response['data'];
+
+      return SendEmailVerificationResponse(
+        statusCode: response['status_code'],
+        message: response['message'] ?? '',
+        code: data['code'],
+        userId: data['user_id'],
+        createdAt: data['created_at'],
+        updatedAt: data['updated_at'],
+        expiredAt: data['expired_at'],
+        idVerifCodeEmail: data['id_verif_code_email'],
+        deletedAt: data['deleted_at'],
+      );
+    } else {
+      throw Exception(
+          'Failed to send email verification: ${response.toString()}');
+    }
+  }
+
+  Future<SubmitEmailVerificationResponse> submitEmailVerification({
+    required String smsCode,
+  }) async {
+    try {
+      final response = await ApiClient.post(
+        '/verif-code/validation-code',
+        body: {
+          'code': smsCode,
+        },
+      );
+
+      return SubmitEmailVerificationResponse.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to verify email: $e');
+    }
+  }
+
+  Future<UploadImageProfileResponse> uploadImageProfile({
+    required String file,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final uri =
+        Uri.parse('${dotenv.env['API_BASE_URL']}/user/upload-image-profile');
+
+    // Detect file extension and set mime subtype
+    final extension = file.split('.').last.toLowerCase();
+    String mimeSubtype;
+
+    if (extension == 'png') {
+      mimeSubtype = 'png';
+    } else if (extension == 'jpg' || extension == 'jpeg') {
+      mimeSubtype = 'jpeg';
+    } else {
+      throw Exception('Unsupported file extension: $extension');
+    }
+
+    final request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          file,
+          contentType: MediaType('image', mimeSubtype),
+        ),
+      );
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return UploadImageProfileResponse.fromJson(responseData);
+    } else {
+      throw Exception('Failed to upload image profile: ${response.body}');
+    }
+  }
+
+  Future<CompleteProfileResponse> completeProfile({
+    required String fullname,
+    required String dateOfBirth,
+    required String parentType,
+    required String timezone,
+  }) async {
+    final response = await ApiClient.post(
+      '/user/complete-profile',
+      body: {
+        'fullname': fullname,
+        'date_of_birth': dateOfBirth,
+        'are_you_a': parentType,
+        'timezone': timezone,
+      },
+    );
+
+    if (response['status_code'] == 200) {
+      return CompleteProfileResponse.fromJson(response);
+    } else {
+      throw Exception(
+        'Failed to complete profile: ${response.toString()}',
+      );
     }
   }
 
@@ -38,7 +156,7 @@ class AuthRepository {
     required String password,
   }) async {
     final response = await ApiClient.post(
-      '/api/auth/login',
+      '/auth/login',
       body: {
         'email': email,
         'password': password,
