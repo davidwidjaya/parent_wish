@@ -24,11 +24,8 @@ class AuthRepository {
       },
     );
 
-    // response is a Map<String, dynamic>
     if (response['status_code'] == 201) {
       final data = response['data'];
-
-      // Save token to shared preferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', data['token']);
 
@@ -189,7 +186,7 @@ class AuthRepository {
 
       request.files.add(
         await http.MultipartFile.fromPath(
-          'image', // backend expects this key
+          'image',
           image,
           contentType: MediaType('image', mimeSubtype),
         ),

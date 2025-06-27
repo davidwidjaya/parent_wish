@@ -67,12 +67,9 @@ class _ListChildrenScreenState extends State<ListChildrenScreen> {
                         return ChildItem(
                           name: child.fullname,
                           gender: child.gender,
-                          age: child
-                              .ageCategory, // or calculate based on birthdate if available
+                          age: child.ageCategory,
                           iconPath: 'assets/icons/man.png',
-                          onDelete: () {
-                            // add delete logic here
-                          },
+                          onDelete: () {},
                         );
                       },
                       separatorBuilder: (_, __) => SizedBox(height: 12.h),
