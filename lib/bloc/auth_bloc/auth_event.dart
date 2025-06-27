@@ -68,6 +68,37 @@ class AuthCompleteProfile extends AuthEvent {
       ];
 }
 
+class AuthAddChildren extends AuthEvent {
+  final String fullname;
+  final String gender;
+  final String ageCategory;
+  final String schoolDay;
+  final String startSchoolTime;
+  final String endSchoolTime;
+  final String image;
+
+  AuthAddChildren({
+    required this.fullname,
+    required this.gender,
+    required this.ageCategory,
+    required this.schoolDay,
+    required this.startSchoolTime,
+    required this.endSchoolTime,
+    required this.image,
+  });
+
+  @override
+  List<Object?> get props => [
+        fullname,
+        gender,
+        ageCategory,
+        schoolDay,
+        startSchoolTime,
+        endSchoolTime,
+        image,
+      ];
+}
+
 class AuthLoginManual extends AuthEvent {
   final String email;
   final String password;

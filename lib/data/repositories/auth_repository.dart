@@ -151,6 +151,63 @@ class AuthRepository {
     }
   }
 
+  Future<AddChildrenResponse> addChildren({
+    required String fullname,
+    required String gender,
+    required String ageCategory,
+    required String schoolDay,
+    required String startSchoolTime,
+    required String endSchoolTime,
+    required String? image, // image as optional
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final uri = Uri.parse('${dotenv.env['API_BASE_URL']}/children/add');
+
+    final request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..fields['fullname'] = fullname
+      ..fields['gender'] = gender
+      ..fields['age_category'] = ageCategory
+      ..fields['school_day'] = schoolDay
+      ..fields['start_school_time'] = startSchoolTime
+      ..fields['end_school_time'] = endSchoolTime;
+
+    // Add image if available
+    if (image != null && image.isNotEmpty) {
+      final extension = image.split('.').last.toLowerCase();
+      String mimeSubtype;
+
+      if (extension == 'png') {
+        mimeSubtype = 'png';
+      } else if (extension == 'jpg' || extension == 'jpeg') {
+        mimeSubtype = 'jpeg';
+      } else {
+        throw Exception('Unsupported image file extension: $extension');
+      }
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image', // backend expects this key
+          image,
+          contentType: MediaType('image', mimeSubtype),
+        ),
+      );
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      return AddChildrenResponse.fromJson(responseData);
+    } else {
+      throw Exception('Failed to add child: ${response.body}');
+    }
+  }
+
   Future<LoginResponse> loginManual({
     required String email,
     required String password,

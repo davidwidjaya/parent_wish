@@ -31,6 +31,8 @@ class AuthProfileImageUploaded extends AuthState {}
 
 class AuthProfileCompleted extends AuthState {}
 
+class AuthChildrenAdded extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
 

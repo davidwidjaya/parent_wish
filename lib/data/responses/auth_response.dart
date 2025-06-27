@@ -126,6 +126,27 @@ class UploadImageProfileResponse {
   }
 }
 
+class AddChildrenResponse {
+  final int statusCode;
+  final String message;
+  final Map<String, dynamic>? data;
+
+  AddChildrenResponse({
+    required this.statusCode,
+    required this.message,
+    this.data,
+  });
+
+  factory AddChildrenResponse.fromJson(Map<String, dynamic> json) {
+    return AddChildrenResponse(
+      statusCode: json['status_code'],
+      message: json['message'],
+      data:
+          json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
+    );
+  }
+}
+
 class LoginResponse {
   final int statusCode;
   final String message;

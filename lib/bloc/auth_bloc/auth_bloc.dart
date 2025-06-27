@@ -79,6 +79,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    on<AuthAddChildren>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await authRepository.addChildren(
+          fullname: event.fullname,
+          gender: event.gender,
+          ageCategory: event.ageCategory,
+          schoolDay: event.schoolDay,
+          startSchoolTime: event.startSchoolTime,
+          endSchoolTime: event.endSchoolTime,
+          image: event.image,
+        );
+
+        emit(AuthChildrenAdded());
+      } catch (error) {
+        emit(AuthError(message: error.toString()));
+      }
+    });
+
     on<AuthLoginManual>((event, emit) {
       emit(AuthLoading());
       authRepository
