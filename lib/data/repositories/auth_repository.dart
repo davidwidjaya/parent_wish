@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parent_wish/data/responses/auth_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,73 @@ import '../models/user.dart';
 import '../../utils/api_client.dart';
 
 class AuthRepository {
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId:
+        dotenv.env['GOOGLE_CLIENT_ID'], // Replace with your Google Client ID
+    scopes: ['email', 'profile'],
+  );
+
+  Future<RegisterGoogleResponse> registerGoogle() async {
+    print('Starting Google Sign In...');
+
+    // Check if already signed in
+    final GoogleSignInAccount? currentUser = _googleSignIn.currentUser;
+
+    GoogleSignInAccount? googleUser;
+
+    if (currentUser != null) {
+      print('User already signed in: ${currentUser.email}');
+      googleUser = currentUser;
+    } else {
+      print('Attempting to sign in...');
+      googleUser = await _googleSignIn.signIn();
+    }
+
+    if (googleUser == null) {
+      print('Google sign in was cancelled by user');
+    }
+
+    print('Google user: ${googleUser?.email}');
+    print('Getting authentication...');
+
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    final String? idToken = googleAuth?.idToken;
+    final String? accessToken = googleAuth?.accessToken;
+
+    print('ID Token: ${idToken != null ? "Present" : "Missing"}');
+    print('Access Token: ${accessToken != null ? "Present" : "Missing"}');
+
+    if (idToken == null) {
+      throw Exception('Failed to get ID token from Google');
+    }
+
+    print('Sending request to backend...');
+
+    // Send ID token to NestJS backend
+    final response = await ApiClient.post(
+      '/auth/google/callback',
+      body: {
+        'id_token': idToken,
+      },
+    );
+
+    if (response['status_code'] == 200) {
+      final data = response['data'];
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token']);
+
+      return RegisterGoogleResponse(
+        token: data['token'],
+        statusCode: response['status_code'],
+        message: response['message'] ?? '',
+      );
+    } else {
+      throw Exception('Failed to register: ${response.toString()}');
+    }
+  }
+
   Future<RegisterResponse> registerManual({
     required String username,
     required String email,

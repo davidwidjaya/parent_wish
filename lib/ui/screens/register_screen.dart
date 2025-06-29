@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
 import 'package:parent_wish/bloc/bloc_exports.dart';
 import 'package:parent_wish/ui/themes/color.dart';
@@ -16,7 +16,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final userIdController = TextEditingController();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
@@ -172,12 +171,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             elevation: 0,
                           ),
-                          onPressed: () {
-                            // Handle Google Sign Up logic
-                          },
+                          onPressed: () {},
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
                             children: [
                               Image.asset(
                                 'assets/icons/google.png',
@@ -198,6 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
+                    // Facebook button (not wired up yet)
                     Padding(
                       padding: EdgeInsets.only(top: 15.h),
                       child: SizedBox(
@@ -221,7 +218,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
                             children: [
                               Image.asset(
                                 'assets/icons/facebook.png',

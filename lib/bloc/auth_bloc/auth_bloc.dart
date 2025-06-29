@@ -27,6 +27,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
+    on<AuthRegisterGoogle>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await authRepository.registerGoogle();
+
+        emit(AuthAuthenticated(token: result.token, isGoogle: true));
+      } catch (error) {
+        emit(AuthError(message: error.toString()));
+      }
+    });
+
     on<AuthSendEmailVerificationCode>((event, emit) async {
       emit(AuthLoading());
       try {

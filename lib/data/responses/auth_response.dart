@@ -28,6 +28,26 @@ class RegisterResponse {
   }
 }
 
+class RegisterGoogleResponse {
+  final String token;
+  final int statusCode;
+  final String message;
+
+  RegisterGoogleResponse({
+    required this.token,
+    required this.statusCode,
+    required this.message,
+  });
+
+  factory RegisterGoogleResponse.fromJson(Map<String, dynamic> json) {
+    return RegisterGoogleResponse(
+      token: json['data']['token'],
+      statusCode: json['status_code'],
+      message: json['message'] ?? '',
+    );
+  }
+}
+
 class SendEmailVerificationResponse {
   final int statusCode;
   final String message;
@@ -149,7 +169,6 @@ class AddChildrenResponse {
   }
 }
 
-
 class ListChildrenResponse {
   final int statusCode;
   final String message;
@@ -163,7 +182,8 @@ class ListChildrenResponse {
 
   factory ListChildrenResponse.fromJson(Map<String, dynamic> json) {
     final childrenData = json['data'] as List<dynamic>;
-    final children = childrenData.map((child) => Child.fromJson(child)).toList();
+    final children =
+        childrenData.map((child) => Child.fromJson(child)).toList();
 
     return ListChildrenResponse(
       statusCode: json['status_code'],
@@ -172,7 +192,6 @@ class ListChildrenResponse {
     );
   }
 }
-
 
 class LoginResponse {
   final int statusCode;

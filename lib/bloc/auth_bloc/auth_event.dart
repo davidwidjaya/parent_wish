@@ -100,7 +100,6 @@ class AuthAddChildren extends AuthEvent {
 }
 
 class AuthListChildren extends AuthEvent {
-
   AuthListChildren();
 
   @override
@@ -118,18 +117,10 @@ class AuthLoginManual extends AuthEvent {
 }
 
 class AuthRegisterGoogle extends AuthEvent {
-  final String email;
-  final String name;
-  final String imageUrl;
-
-  AuthRegisterGoogle({
-    required this.email,
-    required this.name,
-    required this.imageUrl,
-  });
+  AuthRegisterGoogle();
 
   @override
-  List<Object?> get props => [email, name, imageUrl];
+  List<Object?> get props => [];
 }
 
 class AuthRegisterFacebook extends AuthEvent {

@@ -12,13 +12,15 @@ class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
   final String token;
+  final bool? isGoogle;
 
   AuthAuthenticated({
     this.token = '',
+    this.isGoogle,
   });
 
   @override
-  List<Object?> get props => [token];
+  List<Object?> get props => [token, isGoogle];
 }
 
 class AuthUnauthenticated extends AuthState {}
