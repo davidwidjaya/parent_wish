@@ -47,16 +47,18 @@ class ApiClient {
 
   static dynamic _handleResponse(http.Response response) {
     final decoded = jsonDecode(response.body);
+    // print( "DECODED: $decoded");
+    return decoded;
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return decoded;
-    } else if (response.statusCode == 401) {
-      _clearToken(); // clear if unauthorized
-      throw Exception('Unauthorized access. Please login again.');
-    } else {
-      final message = decoded['message'] ?? 'Unexpected error occurred';
-      throw Exception(message);
-    }
+    // if (response.statusCode >= 200 && response.statusCode < 300) {
+    //   return decoded;
+    // } else if (response.statusCode == 401) {
+    //   _clearToken(); // clear if unauthorized
+    //   throw Exception('Unauthorized access. Please login again.');
+    // } else {
+    //   final message = decoded['message'] ?? 'Unexpected error occurred';
+    //   throw Exception(message);
+    // }
   }
 
   static Future<void> _clearToken() async {

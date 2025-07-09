@@ -5,6 +5,7 @@ import 'package:parent_wish/data/models/child.dart';
 import 'package:parent_wish/data/models/index.dart';
 import 'package:parent_wish/data/repositories/auth_repository.dart';
 import 'package:parent_wish/data/repositories/repository_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -12,6 +13,26 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository = RepositoryManager.authRepository;
   AuthBloc() : super(AuthInitial()) {
+    on<AuthCheckLoggedIn>((event, emit) async {
+      emit(AuthLoading());
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token != null && token.isNotEmpty) {
+        emit(AuthAuthenticated(token: token));
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    });
+
+    on<AuthLogout>((event, emit) async {
+      emit(AuthLoading());
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+
+      emit(AuthUnauthenticated());
+    });
+
     on<AuthRegisterManual>((event, emit) async {
       emit(AuthLoading());
       try {
@@ -121,18 +142,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<AuthLoginManual>((event, emit) {
+    on<AuthLoginManual>((event, emit) async {
       emit(AuthLoading());
-      authRepository
-          .loginManual(
-        email: event.email,
-        password: event.password,
-      )
-          .then((result) {
+      try {
+        final result = await authRepository.loginManual(
+          email: event.email,
+          password: event.password,
+        );
+
         emit(AuthAuthenticated(token: result.token));
-      }).catchError((error) {
+      } catch (error) {
         emit(AuthError(message: error.toString()));
-      });
+      }
     });
   }
 }

@@ -296,13 +296,12 @@ class AuthRepository {
       },
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return LoginResponse(
-        token: data['token'],
-        statusCode: response.statusCode,
-        message: data['message'] ?? '',
-      );
+    if (response['status_code'] == 200) {
+      final data = response['data'];
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token']);
+
+      return LoginResponse.fromJson(response);
     } else {
       throw Exception('Failed to login: ${response.body}');
     }

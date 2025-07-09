@@ -20,6 +20,7 @@ class AppColors {
 
   /// Light surfaces (cards, containers, etc.)
   static const Color gray100 = Color(0xFFF9F9F9); // lightBackground
+  static const Color gray150 = Color(0xFFDFE2EB); // lightBackground
 
   /// Text and UI grays
   static const Color gray300 = Color(0xFFF3F3F3);
