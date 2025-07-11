@@ -10,6 +10,7 @@ class AppRouter {
   static const String completeProfile = '/complete_profile';
   static const String verificationEmail = '/verification_email';
   static const String home = '/home';
+  static const String addTask = '/add_task';
 
   static Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -62,6 +63,10 @@ class AppRouter {
       case home:
         return MaterialPageRoute(
           builder: (_) => const HomeScreen(),
+        );
+      case addTask:
+        return MaterialPageRoute(
+          builder: (_) => const AddTaskScreen(),
         );
       default:
         return null;

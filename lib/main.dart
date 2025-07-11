@@ -116,7 +116,8 @@ class _ParentWishState extends State<ParentWish> {
               }
 
               if (state is AuthInitial || state is AuthUnauthenticated) {
-                return const SplashScreen();
+                // return const SplashScreen();
+                return const AddTaskScreen();
               }
 
               if (state is AuthAuthenticated) {

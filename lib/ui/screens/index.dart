@@ -6,3 +6,4 @@ export 'list_children_screen.dart';
 export 'login_screen.dart';
 export 'complete_profile_screen.dart';
 export 'verification_email_screen.dart';
+export 'add_task_screen.dart';
