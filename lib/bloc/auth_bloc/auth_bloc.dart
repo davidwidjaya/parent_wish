@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:parent_wish/data/models/child.dart';
-import 'package:parent_wish/data/models/index.dart';
 import 'package:parent_wish/data/repositories/auth_repository.dart';
 import 'package:parent_wish/data/repositories/repository_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -153,6 +152,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(token: result.token));
       } catch (error) {
         emit(AuthError(message: error.toString()));
+      }
+    });
+
+    on<AuthForgotPassword>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await authRepository.forgotPassword(email: event.email);
+
+        emit(AuthForgotPasswordSent(data: result.data ?? {}));
+      } catch (error) {
+        emit(
+          AuthError(
+            message: error.toString(),
+          ),
+        );
+      }
+    });
+
+    on<AuthVerifyForgotPassword>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await authRepository.verifyForgotPassword(
+          code: event.code,
+          email: event.email,
+          newPassword: event.newPassword,
+        );
+
+        emit(AuthVerifyForgotPasswordSuccess());
+      } catch (error) {
+        emit(
+          AuthError(
+            message: error.toString(),
+          ),
+        );
       }
     });
   }

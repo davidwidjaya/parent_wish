@@ -44,6 +44,17 @@ class AuthListChildrenFetched extends AuthState {
   List<Object?> get props => [children];
 }
 
+class AuthForgotPasswordSent extends AuthState {
+  final Map<String, dynamic> data;
+
+  AuthForgotPasswordSent({required this.data});
+
+  @override
+  List<Object?> get props => [data];
+}
+
+class AuthVerifyForgotPasswordSuccess extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
 

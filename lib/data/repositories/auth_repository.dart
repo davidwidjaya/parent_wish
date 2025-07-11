@@ -306,4 +306,39 @@ class AuthRepository {
       throw Exception('Failed to login: ${response.body}');
     }
   }
+
+  Future<ForgotPasswordResponse> forgotPassword({required String email}) async {
+    final response = await ApiClient.post(
+      '/auth/send-forgot-password',
+      body: {
+        'email': email,
+      },
+    );
+
+    if (response['status_code'] == 200) {
+      return ForgotPasswordResponse.fromJson(response);
+    } else {
+      throw Exception('Failed to forgot password: ${response['body']}');
+    }
+  }
+
+  Future<VerifyForgotPasswordResponse> verifyForgotPassword(
+      {required String code,
+      required String newPassword,
+      required String email}) async {
+    final response = await ApiClient.post(
+      '/auth/forgot-password',
+      body: {
+        'code': code,
+        'new_password': newPassword,
+        'email': email,
+      },
+    );
+
+    if (response['status_code'] == 200) {
+      return VerifyForgotPasswordResponse.fromJson(response);
+    } else {
+      throw Exception('Failed to change password: ${response['body']}');
+    }
+  }
 }

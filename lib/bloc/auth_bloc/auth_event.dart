@@ -145,7 +145,31 @@ class AuthRegisterFacebook extends AuthEvent {
   List<Object?> get props => [email, name, imageUrl];
 }
 
+class AuthForgotPassword extends AuthEvent {
+  final String email;
+
+  AuthForgotPassword({required this.email});
+
+  @override
+  List<Object?> get props => [email];
+}
+
 class AuthLogout extends AuthEvent {
   @override
   List<Object?> get props => [];
+}
+
+class AuthVerifyForgotPassword extends AuthEvent {
+  final String code;
+  final String newPassword;
+  final String email;
+
+  AuthVerifyForgotPassword({
+    required this.code,
+    required this.newPassword,
+    required this.email,
+  });
+
+  @override
+  List<Object?> get props => [code, newPassword, email];
 }

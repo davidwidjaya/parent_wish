@@ -213,3 +213,68 @@ class LoginResponse {
     );
   }
 }
+
+class ForgotPasswordResponse {
+  final int statusCode;
+  final String message;
+  final Map<String, dynamic>? data;
+
+  ForgotPasswordResponse({
+    required this.statusCode,
+    required this.message,
+    this.data,
+  });
+
+  factory ForgotPasswordResponse.fromJson(Map<String, dynamic> json) {
+    // final data = json['data'];
+    return ForgotPasswordResponse(
+      statusCode: json['status_code'],
+      message: json['message'],
+      data:
+          json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
+    );
+  }
+}
+
+class VerifyForgotPasswordResponse {
+  final int statusCode;
+  final String message;
+  final Map<String, dynamic>? data;
+
+  VerifyForgotPasswordResponse({
+    required this.statusCode,
+    required this.message,
+    this.data,
+  });
+
+  factory VerifyForgotPasswordResponse.fromJson(Map<String, dynamic> json) {
+    // final data = json['data'];
+    return VerifyForgotPasswordResponse(
+      statusCode: json['status_code'],
+      message: json['message'],
+      data:
+          json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
+    );
+  }
+}
+
+// class AddChildrenResponse {
+//   final int statusCode;
+//   final String message;
+//   final Map<String, dynamic>? data;
+
+//   AddChildrenResponse({
+//     required this.statusCode,
+//     required this.message,
+//     this.data,
+//   });
+
+//   factory AddChildrenResponse.fromJson(Map<String, dynamic> json) {
+//     return AddChildrenResponse(
+//       statusCode: json['status_code'],
+//       message: json['message'],
+//       data:
+//           json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
+//     );
+//   }
+// }

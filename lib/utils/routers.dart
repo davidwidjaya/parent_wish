@@ -38,8 +38,26 @@ class AppRouter {
           builder: (_) => const VerificationEmailScreen(),
         );
       case login:
+        final args = settings.arguments;
+
+        String? token;
+        bool showForgotPasswordSheet = false;
+
+        // final Map<String, dynamic> data =
+        //     settings.arguments as Map<String, dynamic>;
+
+        if (args != null && args is Map<String, dynamic>) {
+          token = args['token'] as String?;
+          showForgotPasswordSheet =
+              args['showForgotPasswordSheet'] as bool? ?? false;
+        }
+
         return MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
+          builder: (_) => LoginScreen(
+            token: token,
+            showForgotPasswordSheet: showForgotPasswordSheet,
+          ),
+          settings: settings,
         );
       case home:
         return MaterialPageRoute(
