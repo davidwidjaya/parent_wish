@@ -41,7 +41,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
-                    android:host="67ab55487a59.ngrok-free.app"
+                    android:host="project-parent-wish-nest-production.up.railway.app"
                     android:pathPrefix="/reset-password" />
             </intent-filter>
 

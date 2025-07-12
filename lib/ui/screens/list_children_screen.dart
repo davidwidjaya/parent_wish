@@ -40,9 +40,9 @@ class _ListChildrenScreenState extends State<ListChildrenScreen> {
         padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            if (state is AuthLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+            // if (state is AuthLoading) {
+            //   return const Center(child: CircularProgressIndicator());
+            // }
 
             if (state is AuthError) {
               return Center(child: Text(state.message));

@@ -99,13 +99,13 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthLoading) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => const Center(child: CircularProgressIndicator()),
-          );
-        }
+        // if (state is AuthLoading) {
+        //   showDialog(
+        //     context: context,
+        //     barrierDismissible: false,
+        //     builder: (_) => const Center(child: CircularProgressIndicator()),
+        //   );
+        // }
         if (state is AuthChildrenAdded) {
           Navigator.pushNamed(context, '/list_children');
 
