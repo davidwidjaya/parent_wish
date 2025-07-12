@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
+import 'package:parent_wish/bloc/task_bloc/task_bloc.dart';
 import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/widgets/input_dropdown.dart';
 import 'package:parent_wish/widgets/input_field.dart';
@@ -26,26 +27,29 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String? selectedAge;
   String? selectedFrequently;
 
+  void _clearData() {
+    taskNameController.text = "";
+    descriptionController.text = "";
+    videoController.text = "";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocListener<TaskBloc, TaskState>(
       listener: (context, state) {
-        if (state is AuthLoading) {
+        if (state is TaskLoading) {
           // showDialog(
           //   context: context,
           //   barrierDismissible: false,
           //   builder: (_) => const Center(child: CircularProgressIndicator()),
           // );
-        }
-        // else {
-        //   Navigator.of(context, rootNavigator: true).pop(); // Close dialog
-        // }
-
-        if (state is AuthChildrenAdded) {
-          Navigator.pushNamed(context, '/list_children');
-
-          // Navigator.pop(context); // Navigate back or to next screen
-        } else if (state is AuthError) {
+        } else if (state is TaskAdded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Task added!'),
+            ),
+          );
+        } else if (state is TaskError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
@@ -191,15 +195,21 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             child: FilledButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  // context.read<AuthBloc>().add(AuthAddChildren(
-                                  //       fullname: fullNameController.text,
-                                  //       gender: genderController.text,
-                                  //       ageCategory: selectedAge!,
-                                  //       schoolDay: selectedSchoolDays!,
-                                  //       startSchoolTime: startTimeApi!,
-                                  //       endSchoolTime: endTimeApi!,
-                                  //       image: profileImage!.path,
-                                  //     ));
+                                  print('SUBMITTING: ');
+                                  print(taskNameController.text);
+                                  print(descriptionController.text);
+                                  print(selectedAge);
+                                  print(selectedFrequently);
+                                  print(videoController.text);
+                                  context.read<TaskBloc>().add(TaskAdd(
+                                        taskName: taskNameController.text,
+                                        desc: descriptionController.text,
+                                        age: selectedAge ?? '',
+                                        frequently: selectedFrequently ?? '',
+                                        videoURL: videoController.text,
+                                      ));
+
+                                  _clearData();
                                 }
                               },
                               style: FilledButton.styleFrom(

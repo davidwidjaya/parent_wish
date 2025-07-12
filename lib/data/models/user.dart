@@ -8,7 +8,7 @@ class User {
   final String? timezone;
   final String? profileImg;
   final DateTime? verifiedAt;
-  final String? step;
+  final String? step; //step_edit_profile | step_verif_code | step_completed
 
   const User({
     required this.id,

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -137,18 +139,55 @@ class LoginScreenState extends State<LoginScreen> {
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
+        final navigator =
+            Navigator.of(context); // capture navigator before await
+
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
         } else if (state is AuthAuthenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login Successfully!')),
-          );
-          Navigator.pushReplacementNamed(
-            context,
-            AppRouter.home,
-          );
+          if (state.isGoogle == true) {
+            //Auth with Google
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var userString = prefs.getString('user') ?? '{}';
+            var user = jsonDecode(userString);
+            print(user);
+
+            if (user['step'] == 'step_verif_code') {
+              navigator.pushReplacementNamed(
+                AppRouter.verificationEmail,
+              );
+            } else if (user['step'] == 'step_edit_profile') {
+              navigator.pushReplacementNamed(
+                AppRouter.completeProfile,
+              );
+            } else if (user['step'] == 'step_completed') {
+              navigator.pushReplacementNamed(
+                AppRouter.home,
+              );
+            }
+          } else {
+            //Auth manual
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var userString = prefs.getString('user') ?? '{}';
+            var user = jsonDecode(userString);
+            print(user);
+
+            if (user['step'] == 'step_verif_code') {
+              navigator.pushReplacementNamed(
+                AppRouter.verificationEmail,
+              );
+            } else if (user['step'] == 'step_edit_profile') {
+              navigator.pushReplacementNamed(
+                AppRouter.completeProfile,
+              );
+            } else if (user['step'] == 'step_completed') {
+              navigator.pushReplacementNamed(
+                AppRouter.home,
+              );
+            }
+          }
         } else if (state is AuthForgotPasswordSent) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -321,7 +360,7 @@ class LoginScreenState extends State<LoginScreen> {
                             elevation: 0,
                           ),
                           onPressed: () {
-                            // Handle Google Sign Up logic
+                            context.read<AuthBloc>().add(AuthRegisterGoogle());
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment
@@ -335,7 +374,7 @@ class LoginScreenState extends State<LoginScreen> {
                               ),
                               SizedBox(width: 12.w),
                               Text(
-                                'Sign Up with Google',
+                                'Sign In with Google',
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.w500,
@@ -381,7 +420,7 @@ class LoginScreenState extends State<LoginScreen> {
                               ),
                               SizedBox(width: 12.w),
                               Text(
-                                'Sign Up with Facebook',
+                                'Sign In with Facebook',
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.w500,

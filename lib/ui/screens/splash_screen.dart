@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +8,7 @@ import 'package:parent_wish/bloc/auth_bloc/auth_bloc.dart';
 import 'package:parent_wish/bloc/bloc_exports.dart';
 import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/utils/routers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,20 +21,35 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
+      listener: (context, state) async {
+        final navigator =
+            Navigator.of(context); // capture navigator before await
+
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
         } else if (state is AuthAuthenticated) {
           if (state.isGoogle == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Google Sign-In successful!')),
-            );
-            Navigator.pushReplacementNamed(
-              context,
-              AppRouter.completeProfile,
-            );
+            //Auth with Google
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var userString = prefs.getString('user') ?? '{}';
+            var user = jsonDecode(userString);
+            print(user);
+
+            if (user['step'] == 'step_verif_code') {
+              navigator.pushReplacementNamed(
+                AppRouter.verificationEmail,
+              );
+            } else if (user['step'] == 'step_edit_profile') {
+              navigator.pushReplacementNamed(
+                AppRouter.completeProfile,
+              );
+            } else if (user['step'] == 'step_completed') {
+              navigator.pushReplacementNamed(
+                AppRouter.home,
+              );
+            }
           }
         }
       },

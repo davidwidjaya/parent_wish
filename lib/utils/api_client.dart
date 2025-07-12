@@ -46,6 +46,8 @@ class ApiClient {
   }
 
   static dynamic _handleResponse(http.Response response) {
+    print('handle response: ');
+    print(response.body);
     final decoded = jsonDecode(response.body);
     // print( "DECODED: $decoded");
     return decoded;

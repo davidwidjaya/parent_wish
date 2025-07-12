@@ -1,5 +1,6 @@
 export 'auth_response.dart';
 import 'package:parent_wish/data/models/child.dart';
+import 'package:parent_wish/data/models/task.dart';
 
 import '../models/user.dart';
 import '../models/verif_code_email.dart';
@@ -258,23 +259,30 @@ class VerifyForgotPasswordResponse {
   }
 }
 
-// class AddChildrenResponse {
-//   final int statusCode;
-//   final String message;
-//   final Map<String, dynamic>? data;
+class AddTaskResponse {
+  final int statusCode;
+  final String message;
+  final Task? data;
 
-//   AddChildrenResponse({
-//     required this.statusCode,
-//     required this.message,
-//     this.data,
-//   });
+  AddTaskResponse({
+    required this.statusCode,
+    required this.message,
+    this.data,
+  });
 
-//   factory AddChildrenResponse.fromJson(Map<String, dynamic> json) {
-//     return AddChildrenResponse(
-//       statusCode: json['status_code'],
-//       message: json['message'],
-//       data:
-//           json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
-//     );
-//   }
-// }
+  factory AddTaskResponse.fromJson(Map<String, dynamic> json) {
+    return AddTaskResponse(
+      statusCode: json['status_code'],
+      message: json['message'],
+      data: json['data'] != null ? Task.fromJson(json['data']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status_code': statusCode,
+      'message': message,
+      'data': data?.toJson(),
+    };
+  }
+}

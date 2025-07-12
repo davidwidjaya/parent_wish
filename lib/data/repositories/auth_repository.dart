@@ -62,11 +62,17 @@ class AuthRepository {
       },
     );
 
+    print('loginwgoogle: ');
+    print(response['data']);
     if (response['status_code'] == 200) {
       final data = response['data'];
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', data['token']);
+      print('login with google: ');
+      print(data);
+      await prefs.setString('user', json.encode(data));
+      print(json.encode(data));
 
       return RegisterGoogleResponse(
         token: data['token'],
@@ -96,6 +102,10 @@ class AuthRepository {
       final data = response['data'];
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', data['token']);
+      print('register: ');
+      print(data);
+      await prefs.setString('user', json.encode(data));
+      print(json.encode(data));
 
       return RegisterResponse(
         user: User.fromJson(data),
@@ -104,7 +114,7 @@ class AuthRepository {
         message: response['message'] ?? '',
       );
     } else {
-      throw Exception('Failed to register: ${response.toString()}');
+      throw Exception('Failed to register: ${response['message']}');
     }
   }
 
@@ -141,6 +151,15 @@ class AuthRepository {
           'code': smsCode,
         },
       );
+
+      if (response['status_code'] == 200) {
+        final data = response['data'];
+        final prefs = await SharedPreferences.getInstance();
+        print('submit email verification: ');
+        print(data);
+        await prefs.setString('user', json.encode(data));
+        print(json.encode(data));
+      }
 
       return SubmitEmailVerificationResponse.fromJson(response);
     } catch (e) {
@@ -208,6 +227,12 @@ class AuthRepository {
     );
 
     if (response['status_code'] == 200) {
+      final data = response['data'];
+      final prefs = await SharedPreferences.getInstance();
+      print('complete profile: ');
+      print(data);
+      await prefs.setString('user', json.encode(data));
+      print(json.encode(data));
       return CompleteProfileResponse.fromJson(response);
     } else {
       throw Exception(
@@ -300,10 +325,14 @@ class AuthRepository {
       final data = response['data'];
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', data['token']);
+      print('login: ');
+      print(data);
+      await prefs.setString('user', json.encode(data));
+      print(json.encode(data));
 
       return LoginResponse.fromJson(response);
     } else {
-      throw Exception('Failed to login: ${response.body}');
+      throw Exception('Failed to login: ${response['message']}');
     }
   }
 
@@ -336,9 +365,17 @@ class AuthRepository {
     );
 
     if (response['status_code'] == 200) {
+      final data = response['data'];
+      final prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('token', data['token']);
+      // print('verify forgot password: ');
+      // print(data);
+      // await prefs.setString('user', json.encode(data));
+      // print(json.encode(data));
+
       return VerifyForgotPasswordResponse.fromJson(response);
     } else {
-      throw Exception('Failed to change password: ${response['body']}');
+      throw Exception('Failed to change password: ${response['message']}');
     }
   }
 }

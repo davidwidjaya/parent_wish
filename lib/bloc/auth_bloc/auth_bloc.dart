@@ -28,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
+      await prefs.remove('user');
 
       emit(AuthUnauthenticated());
     });

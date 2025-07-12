@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +11,7 @@ import 'package:parent_wish/bloc/bloc_manager.dart';
 import 'package:parent_wish/ui/screens/index.dart';
 import 'package:parent_wish/utils/routers.dart';
 import 'package:app_links/app_links.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -41,7 +44,6 @@ class _ParentWishState extends State<ParentWish> {
   void initState() {
     super.initState();
 
-    // Now safe to call since context is under MultiBlocProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthBloc>().add(AuthCheckLoggedIn());
     });
@@ -65,21 +67,10 @@ class _ParentWishState extends State<ParentWish> {
   void _handleIncomingLink(Uri? uri) {
     if (uri == null) return;
 
-    print('Incoming URI: $uri');
-
     if (uri.path == '/reset-password' &&
         uri.queryParameters.containsKey('token')) {
       final token = uri.queryParameters['token'];
       if (token != null) {
-        // Use navigatorKey to push instead of context
-        // navigatorKey.currentState?.push(
-        //   MaterialPageRoute(
-        //     builder: (_) => const LoginScreen(),
-        //     settings: RouteSettings(
-        //       arguments: {'token': token, 'showForgotPasswordSheet': true},
-        //     ),
-        //   ),
-        // );
         navigatorKey.currentState?.pushNamed(AppRouter.login, arguments: {
           'token': token,
           'showForgotPasswordSheet': true,
@@ -88,16 +79,35 @@ class _ParentWishState extends State<ParentWish> {
     }
   }
 
-  @override
-  void dispose() {
-    BlocManager.dispose();
-    super.dispose();
+  void _handleRedirectByStep() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userString = prefs.getString('user') ?? '{}';
+    final user = jsonDecode(userString);
+
+    final step = user['step'];
+    print('stepxx: ');
+    print(step);
+    if (step == 'step_completed') {
+      navigatorKey.currentState?.pushReplacementNamed(AppRouter.home);
+    } else {
+      navigatorKey.currentState?.pushReplacementNamed(AppRouter.splash);
+      // return const SplashScreen();
+    }
+    // if (step == 'step_verif_code') {
+    //   navigatorKey.currentState
+    //       ?.pushReplacementNamed(AppRouter.verificationEmail);
+    // } else if (step == 'step_edit_profile') {
+    //   navigatorKey.currentState
+    //       ?.pushReplacementNamed(AppRouter.completeProfile);
+    // } else if (step == 'step_completed') {
+    //   navigatorKey.currentState?.pushReplacementNamed(AppRouter.home);
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(375, 812), // iPhone 12 Pro size
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -107,29 +117,47 @@ class _ParentWishState extends State<ParentWish> {
           theme: ThemeData(
             textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme),
           ),
-          home: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              print('bloc state is: $state');
-
-              if (state is AuthLoading) {
-                return const SplashScreen();
-              }
-
-              if (state is AuthInitial || state is AuthUnauthenticated) {
-                // return const SplashScreen();
-                return const AddTaskScreen();
-              }
+          home: BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              print("AuthBloc listener triggered: $state");
 
               if (state is AuthAuthenticated) {
-                return const HomeScreen();
+                print("Redirecting by step...");
+                _handleRedirectByStep();
               }
 
-              return const SplashScreen(); // safe fallback
+              if (state is AuthUnauthenticated) {
+                print("Navigating to splash screen...");
+                navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  AppRouter.splash,
+                  (route) => false,
+                );
+              }
             },
+            child: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthLoading) return const SplashScreen();
+                if (state is AuthUnauthenticated || state is AuthInitial) {
+                  return const SplashScreen();
+                }
+                if (state is AuthAuthenticated) {
+                  // Show a temporary screen while waiting for _handleRedirectByStep
+                  return const SplashScreen();
+                }
+
+                return const SplashScreen();
+              },
+            ),
           ),
           onGenerateRoute: AppRouter.generateRoute,
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    BlocManager.dispose();
+    super.dispose();
   }
 }

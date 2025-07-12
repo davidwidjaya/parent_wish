@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -6,6 +8,7 @@ import 'package:parent_wish/bloc/bloc_exports.dart';
 import 'package:parent_wish/ui/themes/color.dart';
 import 'package:parent_wish/utils/routers.dart';
 import 'package:parent_wish/widgets/input_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,16 +26,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
+      listener: (context, state) async {
+        final navigator =
+            Navigator.of(context); // capture navigator before await
+
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
         } else if (state is AuthAuthenticated) {
-          Navigator.pushReplacementNamed(
-            context,
-            AppRouter.verificationEmail,
-          );
+          if (state.isGoogle == true) {
+            //Auth with Google
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Google Sign-In successful!')),
+            );
+            navigator.pushReplacementNamed(
+              AppRouter.completeProfile,
+            );
+          } else {
+            //Auth manual
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var userString = prefs.getString('user') ?? '{}';
+            var user = jsonDecode(userString);
+            print(user);
+
+            if (user['step'] == 'step_verif_code') {
+              navigator.pushReplacementNamed(
+                AppRouter.verificationEmail,
+              );
+            } else if (user['step'] == 'step_edit_profile') {
+              navigator.pushReplacementNamed(
+                AppRouter.completeProfile,
+              );
+            } else if (user['step'] == 'step_completed') {
+              navigator.pushReplacementNamed(
+                AppRouter.home,
+              );
+            }
+          }
         }
       },
       child: Scaffold(
@@ -171,7 +202,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             elevation: 0,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<AuthBloc>().add(AuthRegisterGoogle());
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -253,12 +286,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 4.w),
-                            child: Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.blue500,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRouter.login,
+                                );
+                              },
+                              child: Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.blue500,
+                                ),
                               ),
                             ),
                           ),

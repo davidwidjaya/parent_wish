@@ -105,11 +105,7 @@ class _AddChildrenScreenState extends State<AddChildrenScreen> {
             barrierDismissible: false,
             builder: (_) => const Center(child: CircularProgressIndicator()),
           );
-        } 
-        // else {
-        //   Navigator.of(context, rootNavigator: true).pop(); // Close dialog
-        // }
-
+        }
         if (state is AuthChildrenAdded) {
           Navigator.pushNamed(context, '/list_children');
 
